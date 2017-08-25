@@ -1,0 +1,17 @@
+{
+  "name": "koa-api-framework",
+  "version": "1.0.10",
+  "description": "An API framework using Koa built using RAML",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "koa",
+    "api",
+    "api-framework",
+    "koa-api-framework"
+  ],
+  "author": "Laurie Odgers",
+  "license": "MIT"
+}
