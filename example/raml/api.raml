@@ -1,0 +1,61 @@
+#%RAML 0.8
+---
+title: Test API
+baseUri: https://api.foo.com/
+version: v1
+mediaType: application/json
+protocols: [HTTPS, HTTP]
+
+traits:
+    - authenticated:
+        usage: Apply to any method which requires a user to be authenticated
+
+/user:
+    /whoami:
+        get:
+            is: [authenticated]
+            displayName: Who am I?
+            description: |
+                Get details on the logged in user
+            responses:
+                200:
+                    description: Users details returned
+/person:
+    post:
+        displayName: Add person
+        is: [ authenticated ]
+        description: |
+            Add person
+        body:
+            schema:
+                !include schema/request/person/post.json
+    /list:
+        get:
+            displayName: List all jobs
+            is: [ authenticated ]
+            description: |
+                List all jobs
+            responses:
+                200:
+                    description: List of all jobs
+
+    /{person_id}:
+        get:
+            displayName: Get person
+            is: [ authenticated ]
+            description: |
+                Get a person
+        put:
+            displayName: person update
+            is: [ authenticated ]
+            description: |
+                Update a person
+            body:
+                schema:
+                    !include schema/request/person/put.json
+
+        delete:
+            displayName: person delete
+            is: [ authenticated ]
+            description: |
+                Delete a person

@@ -44,7 +44,7 @@ function ApiFramework(obj) {
 ApiFramework.prototype.start = function*() {
     var self = this;
 
-    var app = koa();
+    var app = new koa();
     app
         .use(cors())
         .use(bodyParser());
