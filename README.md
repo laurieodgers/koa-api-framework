@@ -6,8 +6,9 @@ An API framework using Koa. This will build an API framework based off a RAML 0.
 
 # Necessary files to work
 These may be passed in as arguments to koa-api-framework in the future. I am open to suggestions on how to make this more user friendly.
-/raml/api.raml - the RAML specification for the API
-/controllers/ - controllers based off the api structure. Eg an api structure of https://api.foo.com/v2/auth will require /controllers/auth/index.js
+
+- /raml/api.raml - the RAML specification for the API
+- /controllers/ - controllers based off the api structure. Eg an API structure of https://api.foo.com/v2/auth will require /controllers/auth/index.js
 
 # Installation
 Using npm:
