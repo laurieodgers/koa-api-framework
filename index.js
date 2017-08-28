@@ -22,6 +22,7 @@ function ApiFramework(obj) {
     self.models = obj.models;
     self.jwtSecret = obj.jwtSecret;
     self.apiBase = obj.apiBase;
+    self.raml = obj.raml || './raml/api.raml';
 
     // split out the base path from the given api url
     self.pathBase = self.apiBase.split('://')[1];
@@ -168,6 +169,7 @@ ApiFramework.prototype.start = function*() {
             returnError(this, 500, "An internal error occurred", err);
             return;
         }
+        console.log(this.data)
 
         // everything worked so return status 200 and the data
         this.status = 200;
@@ -184,7 +186,7 @@ ApiFramework.prototype.start = function*() {
     };
 
     // parse the raml and set up the API structure
-    ramlParser.loadFile('./raml/api.raml').then(function(raml) {
+    ramlParser.loadFile(self.raml).then(function(raml) {
         console.log('------');
         console.log(raml.title);
         console.log('------');

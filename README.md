@@ -14,12 +14,15 @@ Any incoming `Authorization: Bearer (jwt)` headers which are received will autom
 
 # Necessary files
 These may be passed in as arguments to koa-api-framework in the future. I am open to suggestions on how to make this more user friendly.
-
-- /raml/api.raml - the RAML specification for the API
+s
 - /controllers/ - controllers based off the api structure. Eg an API structure of https://api.foo.com/v2/auth will require /controllers/auth/index.js. More information can be gained from the example given under /example.
 
+# Returning data to the client
+- `this.data` within your controllers allows you to return data to the client
+- Any errors thrown within your controllers will be caught by the framework in order to always present JSON to the client. To throw an error and return a HTTP status code and message to the client, use `throw new Error("418:I'm a teapot!");` where 418 is the status code, and "I'm a teapot!" is the error message to the user.
+
 # Example
-An example can be found under /example
+An example can be found under /example.
 
 # Installation
 Using npm:
@@ -33,11 +36,17 @@ var KoaApiFramework = require('koa-api-framework');
 
 // set up the framework
 var framework = new KoaApiFramework({
+    // disable extra debug logging
     debug: false,
+    // enable SSL/TLS
     tls: true,
+    // the ssl/tls private key
     tlsKeyPath: '/path/to/tls/key/server.key',
+    // the ssl/tls certificate path
     tlsCertPath: '/path/to/tls/cert/server.crt',
     port: 443,
+    // pass in a path to a raml file
+    raml: './raml/api.raml',
     apiBase: 'https://api.foo.com/v2',
     // pass in any models to make them easy to use
     models: {

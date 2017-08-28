@@ -8,7 +8,9 @@ co(function* () {
     var framework = new KoaApiFramework({
         debug: true,
         tls: false,
-        port: 80,
+        port: 8080,
+        // pass in the path to the raml file
+        raml: './raml/api_specification.raml',
         apiBase: 'http://api.foo.com/v2',
         // pass in any models to make them easy to use
         models: {},
