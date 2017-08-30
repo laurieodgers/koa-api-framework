@@ -8,7 +8,7 @@ whoami.get = function*() {
     // Access models through this.models
     // Access JWT through this.token
 
-    this.data.data = {
+    this.data = {
         "userId": "1"
     }
 

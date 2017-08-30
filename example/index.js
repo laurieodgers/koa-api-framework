@@ -11,7 +11,7 @@ co(function* () {
         port: 8080,
         // pass in the path to the raml file
         raml: './raml/api_specification.raml',
-        apiBase: 'http://api.foo.com/v2',
+        //apiBase: 'http://api.foo.com/v1',
         // pass in any models to make them easy to use
         models: {},
         // koa-api-framework will automatically decode Authorization: Bearer [jwt] for you

@@ -21,14 +21,8 @@ function ApiFramework(obj) {
     self.database = obj.database;
     self.models = obj.models;
     self.jwtSecret = obj.jwtSecret;
-    self.apiBase = obj.apiBase;
+    self.pathBase = processUri(obj.apiBase) || '';
     self.raml = obj.raml || './raml/api.raml';
-
-    // split out the base path from the given api url
-    self.pathBase = self.apiBase.split('://')[1];
-    self.pathBase = self.pathBase.split('/');
-    delete self.pathBase[0];
-    self.pathBase = self.pathBase.join('/');
 
     obj = _.pick(obj, [
         'tls',
@@ -40,6 +34,18 @@ function ApiFramework(obj) {
     self.options = obj;
 
     self.router = new koaRouter();
+}
+
+// split out the base path from the given api url
+function processUri(uri) {
+    if (!uri) {
+        return '';
+    }
+    var pathBase = uri.split('://')[1];
+    pathBase = pathBase.split('/');
+    delete pathBase[0];
+
+    return pathBase.join('/');
 }
 
 ApiFramework.prototype.start = function*() {
@@ -54,7 +60,6 @@ ApiFramework.prototype.start = function*() {
         this.db = self.database;
         this.models = self.models;
         this.jwtSecret = self.jwtSecret;
-        this.apiBase = self.apiBase;
 
         // set up data so we can use it downstream
         this.data = {};
@@ -169,7 +174,6 @@ ApiFramework.prototype.start = function*() {
             returnError(this, 500, "An internal error occurred", err);
             return;
         }
-        console.log(this.data)
 
         // everything worked so return status 200 and the data
         this.status = 200;
@@ -190,6 +194,12 @@ ApiFramework.prototype.start = function*() {
         console.log('------');
         console.log(raml.title);
         console.log('------');
+
+        // if the pathBase wasnt provided then retrieve it from RAML
+        if (!self.pathBase) {
+            self.pathBase = processUri(raml.baseUri);
+        }
+
 
         self.endpoints = [];
 
