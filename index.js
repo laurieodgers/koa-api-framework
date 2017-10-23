@@ -72,11 +72,14 @@ ApiFramework.prototype.start = function*() {
         var urlArray = this.request.url.substr(1).split('/');
         this.ramlRef = this.request.url;
 
+        // strip the queryString
+        var searchString = this.request.url.split('?')[0];
+
         // search for this endpoint in our list for easy validation
         for (var i = 0; i < self.endpoints.length; i++) {
             if (
                 (self.endpoints[i].method.toLowerCase() == this.request.method.toLowerCase()) &&
-                (this.request.url.toLowerCase().match(self.endpoints[i].regexPath))
+                (searchString.toLowerCase().match(self.endpoints[i].regexPath))
             ) {
                 this.endpoint = self.endpoints[i];
             }
