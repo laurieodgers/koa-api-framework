@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/laurieodgers/koa-api-framework.svg?branch=master)](https://travis-ci.org/laurieodgers/koa-api-framework)
+
 # Description
 
 An API framework using Koa. This will build an API framework based off a RAML 0.8 file, applying any JSON schemas on incoming data to make validation simpler.
