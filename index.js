@@ -25,6 +25,9 @@ function ApiFramework(obj) {
     self.raml = obj.raml || './raml/api.raml';
     this.authTraits = obj.authTraits || ['authenticated'];
 
+    // strip trailing slash
+    this.controllerPath = obj.controllerPath.replace(/\/+$/,'') || '/controllers';
+
     obj = _.pick(obj, [
         'tls',
         'tlsKeyPath',
@@ -42,6 +45,9 @@ function processUri(uri) {
     if (!uri) {
         return '';
     }
+    // remove any trailing slashes
+    uri = uri.replace(/\/+$/,'');
+
     var pathBase = uri.split('://')[1];
     pathBase = pathBase.split('/');
     delete pathBase[0];
@@ -62,6 +68,7 @@ ApiFramework.prototype.start = function*() {
         this.models = self.models;
         this.jwtSecret = self.jwtSecret;
         this.authTraits = self.authTraits;
+        this.controllerPath = self.controllerPath;
 
         // set up data so we can use it downstream
         this.data = {};
@@ -314,7 +321,13 @@ ApiFramework.prototype.start = function*() {
             if (resources[i].methods) {
 
                 // get the file and register the routes
-                var endpoints = require(process.cwd() + '/controllers' + thisPath + '/index');
+                var controllerAbsolutePath = process.cwd() + self.controllerPath + thisPath + '/index';
+                try {
+                    var endpoints = require(controllerAbsolutePath);
+                } catch (err) {
+                    console.error("ERROR: Controller not found at" + controllerAbsolutePath);
+                    process.exit(1);
+                }
 
                 for (var j = 0; j < resources[i].methods.length; j++) {
                     var method = resources[i].methods[j];

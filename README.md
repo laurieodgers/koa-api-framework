@@ -10,7 +10,7 @@ Place your RAML file within raml/api.raml in your project's directory. Currently
 Automatic validation of incoming JSON data is performed if you specify the JSON schema within the api.raml file. This removes the need for validation within each individual endpoint controller.
 
 ## Automatic JWT decoding
-Any incoming `Authorization: Bearer (jwt)` headers which are received will automatically decode the given JWT and place it within this.token.
+Set RAML traits on your endpoints to indicate that a JWT is required. Any incoming `Authorization: Bearer (jwt)` headers for these endpoints will automatically decode the given JWT and place it within this.token.
 
 # Necessary files
 These may be passed in as arguments to koa-api-framework in the future. I am open to suggestions on how to make this more user friendly.
@@ -46,6 +46,7 @@ var framework = new KoaApiFramework({
     tlsCertPath: '/path/to/tls/cert/server.crt',
     port: 443,
     // pass in a path to a raml file
+    // DEFAULT: './raml/api.raml'
     raml: './raml/api.raml',
     apiBase: 'https://api.foo.com/v2',
     // pass in any models to make them easy to use
@@ -54,8 +55,15 @@ var framework = new KoaApiFramework({
         person: person,
         group: group
     },
+    // specify where the controllers are in the filesystem
+    // DEFAULT: ./controllers
+    controllerPath: '/ctrl',
     // koa-api-framework will automatically decode Authorization: Bearer [jwt] for you
-    jwtSecret: 'qwertyuiopasdfghjklzxcvbnm123456'
+    // for endpoints which are specified in 'authTraits'
+    jwtSecret: 'qwertyuiopasdfghjklzxcvbnm123456',
+    // set which traits will decode the JWT
+    // DEFAULT: ['authenticated']
+    authTraits: ['authenticated', 'administrator', 'myAuthenticatedTrait']
 });
 
 ```
