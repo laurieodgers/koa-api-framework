@@ -100,6 +100,7 @@ ApiFramework.prototype.start = function*() {
         }
 
         var contentType;
+
         // validate the content type
         if (this.request.header['content-type']) {
             var contentTypeArray = this.request.header['content-type'].toLowerCase().split(';');
@@ -110,7 +111,7 @@ ApiFramework.prototype.start = function*() {
                 returnError(this, 415, "Content-type '" + contentType + "' not supported");
                 return;
             }
-        } else {
+        } else if (this.request.header['content-length']) {  // content length is specified but content type is not
             returnError(this, 415, "Content-type not specified");
             return;
         }
