@@ -23,6 +23,7 @@ function ApiFramework(obj) {
     self.jwtSecret = obj.jwtSecret;
     self.pathBase = processUri(obj.apiBase) || '';
     self.raml = obj.raml || './raml/api.raml';
+    this.authTraits = obj.authTraits || ['authenticated'];
 
     obj = _.pick(obj, [
         'tls',
@@ -60,6 +61,7 @@ ApiFramework.prototype.start = function*() {
         this.db = self.database;
         this.models = self.models;
         this.jwtSecret = self.jwtSecret;
+        this.authTraits = self.authTraits;
 
         // set up data so we can use it downstream
         this.data = {};
@@ -103,6 +105,7 @@ ApiFramework.prototype.start = function*() {
             }
         } else {
             returnError(this, 415, "Content-type not specified");
+            return;
         }
 
         yield next;
@@ -132,31 +135,29 @@ ApiFramework.prototype.start = function*() {
 
     app.use(function*(next) {
         // process JWT for JWT endpoints
-        if (
-            (this.endpoint.traits) &&
-            ((this.endpoint.traits.indexOf('authenticated') > -1) ||
-            (this.endpoint.traits.indexOf('administrator') > -1))
-        ) {
+        if (this.endpoint.traits && this.authTraits.some(r=> this.endpoint.traits.indexOf(r) >= 0)> -1) {
+            // make sure it has an authorization header
             if (!this.request.header.authorization) {
-                throw new Error("401:Unauthorized");
+                returnError(this, 401, "Unauthorized");
+                return;
             }
 
+            // remove Bearer from the start of the string
+            var jwtString = this.request.header.authorization.replace(/^([Bb][Ee][Aa][Rr][Ee][Rr]\s)/,"");
+
             try {
-                // remove Bearer from the start of the string
-                var jwtString = this.request.header.authorization.replace(/^([Bb]earer\s)/,"");
-
                 // process jwt and store for later use
-                var token = jwt.decode(jwtString, self.jwtSecret);
-
-                if (!token.userId) {
-                    throw new Error("401:Unauthorized");
-                }
-
-                this.token = token;
-
-
+                this.token = jwt.decode(jwtString, self.jwtSecret);
             } catch (err) {
-                returnError(this, 401, "Unauthorized");
+                // not a valid JWT
+                returnError(this, 400, "Invalid JWT");
+                return;
+            }
+
+            // make sure the JWT includes a subject
+            if (!this.token.sub) {
+                // not a valid JWT
+                returnError(this, 400, "Invalid JWT - Missing Subject");
                 return;
             }
         }

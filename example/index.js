@@ -15,7 +15,9 @@ co(function* () {
         // pass in any models to make them easy to use
         models: {},
         // koa-api-framework will automatically decode Authorization: Bearer [jwt] for you
-        jwtSecret: 'qwertyuiopasdfghjklzxcvbnm123456'
+        jwtSecret: 'qwertyuiopasdfghjklzxcvbnm123456',
+        // set which traits will decode the JWT
+        authTraits: ['authenticated', 'administrator']
     });
 
     yield framework.start();
