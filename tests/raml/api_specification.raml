@@ -20,6 +20,15 @@ traits:
             responses:
                 200:
                     description: Users details returned
+/errors:
+    /500:
+        get:
+            displayName: 500 internal server error
+            description: |
+                throws a 500 error
+            responses:
+                500:
+                    description: error test
 /person:
     post:
         displayName: Add person

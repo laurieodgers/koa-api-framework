@@ -120,23 +120,17 @@ ApiFramework.prototype.start = function*() {
     });
 
     app.use(function*(next) {
-        // catch everything so that we can always return JSON
-        try {
-            // validate the request body
-            if (this.endpoint.requestSchema) {
-                if (!this.request.body) {
-                    throw new Error("400:No data received");
-                }
-
-                var validation = v.validate(this.request.body, this.endpoint.requestSchema);
-
-                if (validation.errors.length > 0) {
-                    throw new Error("400:" + validation.errors.join(", "));
-                }
+        // validate the request body
+        if (this.endpoint.requestSchema) {
+            if (!this.request.body) {
+                throw new Error("400:No data received");
             }
-        } catch(err) {
-            returnError(this, 500, "An internal error occurred", err);
-            return;
+
+            var validation = v.validate(this.request.body, this.endpoint.requestSchema);
+
+            if (validation.errors.length > 0) {
+                throw new Error("400:" + validation.errors.join(", "));
+            }
         }
         yield next;
     });
@@ -262,15 +256,13 @@ ApiFramework.prototype.start = function*() {
 
         // err.message is in the format "statusCode:error message"
         if (caughtErr) {
-            // check if the message contains a : indicating we generated it
+            // check if the message contains a : indicating the user generated it
             if (caughtErr.message.indexOf(':') == 3) {
                 error = caughtErr.message.split(':');
                 statusCode = parseInt(error[0]);
                 errorMessage = error[1];
             } else {
-                // this wasnt an API generated error
-                statusCode = statusCode;
-
+                // this wasnt a user generated error
                 if (self.options.debug) {
                     errorMessage = caughtErr.message;
                 } else {

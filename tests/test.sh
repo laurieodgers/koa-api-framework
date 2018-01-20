@@ -84,6 +84,15 @@ if [[ "${output}" != "{\"status\":415,\"message\":\"Content-type 'text/plain' no
 fi
 echo ""
 
+echo "3. No Content Type"
+output=$( curl -s -H "Authorization: Bearer ${jwtWithSub}" -H "Content-type: " -X "POST" -d '{"name":"test"}' http://localhost:8080/v2/person )
+echo "${output}"
+if [[ "${output}" != '{"status":415,"message":"Content-type not specified","data":{}}' ]]; then
+    echo "FAILED"
+    exit 1
+fi
+echo ""
+
 echo ""
 echo "----"
 echo ""
@@ -107,7 +116,26 @@ if [[ "${output}" != '{"status":404,"message":"Endpoint not found","data":{}}' ]
 fi
 echo ""
 
+echo ""
+echo "----"
+echo ""
+
+echo "GET http://localhost:8080/v2/errors/500"
+echo "1. Check 500 error"
+output=$( curl -s -X "GET" http://localhost:8080/v2/errors/500 )
+echo "${output}"
+if [[ "${output}" != '{"status":500,"message":"500 internal server error","data":{}}' ]]; then
+    echo "FAILED"
+    exit 1
+fi
+echo ""
+
 sleep 10
 
 # kill the server
 kill ${serverPid}
+
+echo ""
+echo "----"
+echo ""
+echo "Tests suceeded"
