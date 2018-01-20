@@ -11,6 +11,11 @@ serverPid=$!
 
 sleep 5
 
+function exitWithError() {
+    kill ${serverPid}
+    exit 1
+}
+
 # test endpoints
 echo "GET http://localhost:8080/v2/user/whoami"
 echo "1. Valid JWT"
@@ -18,7 +23,7 @@ output=$( curl -s -H "Authorization: Bearer ${jwtWithSub}" -X "GET" http://local
 echo "${output}"
 if [[ "${output}" != '{"statusCode":200,"message":"","data":{"userId":"1"}}' ]]; then
     echo "FAILED"
-    exit 1
+    exitWithError
 fi
 echo ""
 echo "2. No Authorization Header"
@@ -26,7 +31,7 @@ output=$( curl -s -X "GET" http://localhost:8080/v2/user/whoami )
 echo "${output}"
 if [[ "${output}" != '{"status":401,"message":"Unauthorized","data":{}}' ]]; then
     echo "FAILED"
-    exit 1
+    exitWithError
 fi
 echo ""
 echo "3. No JWT"
@@ -34,7 +39,7 @@ output=$( curl -s -H "Authorization: Bearer " -X "GET" http://localhost:8080/v2/
 echo "${output}"
 if [[ "${output}" != '{"status":400,"message":"Invalid JWT","data":{}}' ]]; then
     echo "FAILED"
-    exit 1
+    exitWithError
 fi
 echo ""
 echo "4. Invalid JWT"
@@ -42,7 +47,7 @@ output=$( curl -s -H "Authorization: Bearer asdfasdfasdfasdf" -X "GET" http://lo
 echo "${output}"
 if [[ "${output}" != '{"status":400,"message":"Invalid JWT","data":{}}' ]]; then
     echo "FAILED"
-    exit 1
+    exitWithError
 fi
 echo ""
 echo "5. Valid JWT not ours"
@@ -50,7 +55,7 @@ output=$( curl -s -H "Authorization: Bearer ${jwtNotOurs}" -X "GET" http://local
 echo "${output}"
 if [[ "${output}" != '{"status":400,"message":"Invalid JWT","data":{}}' ]]; then
     echo "FAILED"
-    exit 1
+    exitWithError
 fi
 echo ""
 echo "6. Valid JWT but no sub"
@@ -58,7 +63,7 @@ output=$( curl -s -H "Authorization: Bearer ${jwtWithNoSub}" -X "GET" http://loc
 echo "${output}"
 if [[ "${output}" != '{"status":400,"message":"Invalid JWT - Missing Subject","data":{}}' ]]; then
     echo "FAILED"
-    exit 1
+    exitWithError
 fi
 
 echo ""
@@ -71,7 +76,7 @@ output=$( curl -s -H "Authorization: Bearer ${jwtWithSub}" -H "Content-type: app
 echo "${output}"
 if [[ "${output}" != '{"statusCode":200,"message":"","data":{"message":"POST person endpoint"}}' ]]; then
     echo "FAILED"
-    exit 1
+    exitWithError
 fi
 echo ""
 
@@ -80,7 +85,7 @@ output=$( curl -s -H "Authorization: Bearer ${jwtWithSub}" -H "Content-type: tex
 echo "${output}"
 if [[ "${output}" != "{\"status\":415,\"message\":\"Content-type 'text/plain' not supported\",\"data\":{}}" ]]; then
     echo "FAILED"
-    exit 1
+    exitWithError
 fi
 echo ""
 
@@ -89,7 +94,7 @@ output=$( curl -s -H "Authorization: Bearer ${jwtWithSub}" -H "Content-type: " -
 echo "${output}"
 if [[ "${output}" != '{"status":415,"message":"Content-type not specified","data":{}}' ]]; then
     echo "FAILED"
-    exit 1
+    exitWithError
 fi
 echo ""
 
@@ -103,7 +108,7 @@ output=$( curl -s -H "Authorization: Bearer ${jwtWithSub}" -X "GET" http://local
 echo "${output}"
 if [[ "${output}" != '{"statusCode":200,"message":"","data":{"people":[{"name":"Jane"},{"name":"Bob"}]}}' ]]; then
     echo "FAILED"
-    exit 1
+    exitWithError
 fi
 echo ""
 
@@ -112,7 +117,7 @@ output=$( curl -s -H "Authorization: Bearer ${jwtWithSub}" -X "GET" http://local
 echo "${output}"
 if [[ "${output}" != '{"status":404,"message":"Endpoint not found","data":{}}' ]]; then
     echo "FAILED"
-    exit 1
+    exitWithError
 fi
 echo ""
 
@@ -123,10 +128,22 @@ echo ""
 echo "GET http://localhost:8080/v2/errors/500"
 echo "1. Check 500 error"
 output=$( curl -s -X "GET" http://localhost:8080/v2/errors/500 )
+statusCode=$( curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/v2/errors/500 )
 echo "${output}"
-if [[ "${output}" != '{"status":500,"message":"500 internal server error","data":{}}' ]]; then
+if [[ "${output}" != '{"status":500,"message":"500 internal server error","data":{}}'  || ${statusCode} -ne 500 ]]; then
     echo "FAILED"
-    exit 1
+    echo "Status Code: ${statusCode}"
+    echo "Output: ${output}"
+    exitWithError
+fi
+echo ""
+echo "2. Check user error and message"
+output=$( curl -s -X "GET" http://localhost:8080/v2/errors/418 )
+statusCode=$( curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/v2/errors/418 )
+echo "${output}"
+if [[ "${output}" != '{"status":418,"message":"I am a teapot","data":{}}' || ${statusCode} -ne 418 ]]; then
+    echo "FAILED"
+    exitWithError
 fi
 echo ""
 

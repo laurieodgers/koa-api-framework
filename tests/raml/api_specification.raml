@@ -21,6 +21,14 @@ traits:
                 200:
                     description: Users details returned
 /errors:
+    /418:
+        get:
+            displayName: 418 error
+            description: |
+                throws a 418 error
+            responses:
+                500:
+                    description: error test
     /500:
         get:
             displayName: 500 internal server error
