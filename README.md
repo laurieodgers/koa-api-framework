@@ -1,32 +1,33 @@
 [![Build Status](https://travis-ci.org/laurieodgers/koa-api-framework.svg?branch=master)](https://travis-ci.org/laurieodgers/koa-api-framework)
 
-# Description
+# koa-api-framework
+## Description
 
 An API framework using Koa. This will build an API framework based off a RAML 0.8 file, applying any JSON schemas on incoming data to make validation simpler.
 
-# Features
-## Build an API from a RAML specification
+## Features
+### Build an API from a RAML specification
 Place your RAML file within raml/api.raml in your project's directory. Currently koa-api-framework has only been tested against RAML 0.8 files.
 
-## Validate Data Submitted to API
+### Validate Data Submitted to API
 Automatic validation of incoming JSON data is performed if you specify the JSON schema within the api.raml file. This removes the need for validation within each individual endpoint controller.
 
-## Automatic JWT decoding
+### Automatic JWT decoding
 Set RAML traits on your endpoints to indicate that a JWT is required. Any incoming `Authorization: Bearer (jwt)` headers for these endpoints will automatically decode the given JWT and place it within `this.token`.
 
-# Directory Structure
+## Directory Structure
 The controller path may be passed in with `controllerPath` to the constructor. The directory structure underneath must match the part of the path after `apiBase` with respect to the URL.
 
 See /example for a complete example on how to construct your API.
 
-# Returning data to the client
+## Returning data to the client
 - `this.data` within your controllers allows you to return data to the client
 - Any errors thrown within your controllers will be caught by the framework in order to always present JSON to the client. To throw an error and return a HTTP status code and message to the client, use `throw new Error("418:I'm a teapot!");` where 418 is the status code, and "I'm a teapot!" is the error message to the user.
 
-# Example
+## Example
 A complete example can be found under `/example`.
 
-# Installation
+## Installation
 Using npm:
 ```
 npm install --save koa-api-framework
