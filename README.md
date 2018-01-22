@@ -3,11 +3,13 @@
 # koa-api-framework
 ## Description
 
-An API framework using Koa. This will build an API framework based off a RAML 0.8 file, applying any JSON schemas on incoming data to make validation simpler.
+An API framework using Koa.
+
+koa-api-framework builds an API framework from a RAML 0.8 file, with automatic payload validation and JWT decoding for your endpoints.
 
 ## Features
 ### Build an API from a RAML specification
-Place your RAML file within raml/api.raml in your project's directory. Currently koa-api-framework has only been tested against RAML 0.8 files.
+Place your RAML file within raml/api.raml in your project's directory. koa-api-framework has only been tested against RAML 0.8 files.
 
 ### Validate Data Submitted to API
 Automatic validation of incoming JSON data is performed if you specify the JSON schema within the api.raml file. This removes the need for validation within each individual endpoint controller.
@@ -26,6 +28,9 @@ See /example for a complete example on how to construct your API.
 
 ## Example
 A complete example can be found under `/example`.
+
+## Contributing
+Contributions are always welcome; if you fix a bug or implement some extra functionality please issue a PR back to https://github.com/laurieodgers/koa-api-framework
 
 ## Installation
 Using npm:
@@ -70,5 +75,4 @@ var framework = new KoaApiFramework({
     // DEFAULT: ['authenticated']
     authTraits: ['authenticated', 'administrator', 'myAuthenticatedTrait']
 });
-
 ```
