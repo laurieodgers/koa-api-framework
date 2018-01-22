@@ -8,11 +8,11 @@ An API framework using Koa.
 koa-api-framework builds an API framework from a RAML 0.8 file, with automatic payload validation and JWT decoding for your endpoints.
 
 ## Features
-### Build an API from a RAML specification
-Place your RAML file within raml/api.raml in your project's directory. koa-api-framework has only been tested against RAML 0.8 files.
+### An API From RAML
+Your API will be constructed based on RAML. Specify the location in ./raml/api.raml or through the `raml` argument to the constructor.
 
-### Validate Data Submitted to API
-Automatic validation of incoming JSON data is performed if you specify the JSON schema within the api.raml file. This removes the need for validation within each individual endpoint controller.
+### Simple Request Validation
+Automatic validation of incoming JSON data is performed if you specify the JSON schema within your RAML file, removing the need for validation within each individual endpoint.
 
 ### Automatic JWT decoding
 Set RAML traits on your endpoints to indicate that a JWT is required. Any incoming `Authorization: Bearer (jwt)` headers for these endpoints will automatically decode the given JWT and place it within `this.token`.
@@ -22,7 +22,7 @@ The controller path may be passed in with `controllerPath` to the constructor. T
 
 See /example for a complete example on how to construct your API.
 
-## Returning data to the client
+## Returning Data
 - `this.data` within your controllers allows you to return data to the client
 - Any errors thrown within your controllers will be caught by the framework in order to always present JSON to the client. To throw an error and return a HTTP status code and message to the client, use `throw new Error("418:I'm a teapot!");` where 418 is the status code, and "I'm a teapot!" is the error message to the user.
 
