@@ -58,6 +58,16 @@ function processUri(uri) {
 ApiFramework.prototype.start = function*() {
     var self = this;
 
+    // sanity checks
+    if (self.tlsKeyPath && !fs.existsSync(self.tlsKeyPath)) {
+        console.log("TLS key does not exist: " + self.tlsKeyPath);
+        process.exit(1);
+    }
+    if (self.tlsCertPath && !fs.existsSync(self.tlsCertPath)) {
+        console.log("TLS certificate does not exist: " + self.tlsCertPath);
+        process.exit(1);
+    }
+
     var app = new koa();
     app
         .use(cors())
@@ -183,10 +193,14 @@ ApiFramework.prototype.start = function*() {
 
         // everything worked so return status 200 and the data
         this.status = 200;
-        this.body = {
-            statusCode: 200,
-            message: '',
-            data: this.data
+
+        // if the user didn't define this.body then set up a structure for them
+        if (!this.body) {
+            this.body = {
+                statusCode: 200,
+                message: '',
+                data: this.data
+            }
         }
     });
 
@@ -318,8 +332,12 @@ ApiFramework.prototype.start = function*() {
                 try {
                     var endpoints = require(controllerAbsolutePath);
                 } catch (err) {
-                    console.error("ERROR: Controller not found at" + controllerAbsolutePath);
-                    process.exit(1);
+                    if (err.code == 'MODULE_NOT_FOUND') {
+                        console.error("ERROR: Controller not found at " + controllerAbsolutePath);
+                        process.exit(1);
+                    } else {
+                        throw err;
+                    }
                 }
 
                 for (var j = 0; j < resources[i].methods.length; j++) {

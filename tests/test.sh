@@ -147,6 +147,24 @@ if [[ "${output}" != '{"status":418,"message":"I am a teapot","data":{}}' || ${s
 fi
 echo ""
 
+echo ""
+echo "----"
+echo ""
+url=http://localhost:8080/v2/body/test1""
+echo "GET ${url}"
+echo "1. Check body override"
+output=$( curl -s -X "GET" ${url} )
+statusCode=$( curl -s -o /dev/null -w "%{http_code}" ${url} )
+echo "${output}"
+if [[ "${output}" != '{"hello":"world!"}'  || ${statusCode} -ne 200 ]]; then
+    echo "FAILED"
+    echo "Status Code: ${statusCode}"
+    echo "Output: ${output}"
+    exitWithError
+fi
+echo ""
+
+
 sleep 10
 
 # kill the server
@@ -155,4 +173,4 @@ kill ${serverPid}
 echo ""
 echo "----"
 echo ""
-echo "Tests suceeded"
+echo "Tests succeeded"

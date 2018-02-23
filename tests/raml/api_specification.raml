@@ -9,7 +9,15 @@ protocols: [HTTPS, HTTP]
 traits:
     - authenticated:
         usage: Apply to any method which requires a user to be authenticated via JWT
-
+/body:
+    /test1:
+        get:
+            displayName: test for this.body
+            description: |
+                Uses this.body to override the standard data structure
+            responses:
+                200:
+                    description: statusCode, message not returned, only pure data
 /user:
     /whoami:
         get:
