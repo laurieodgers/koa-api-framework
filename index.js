@@ -25,8 +25,12 @@ function ApiFramework(obj) {
     self.raml = obj.raml || './raml/api.raml';
     this.authTraits = obj.authTraits || ['authenticated'];
 
-    // strip trailing slash
-    this.controllerPath = obj.controllerPath.replace(/\/+$/,'') || '/controllers';
+    if (obj.controllerPath) {
+        // strip trailing slash
+        this.controllerPath = obj.controllerPath.replace(/\/+$/,'');
+    } else {
+        this.controllerPath = '/controllers';
+    }
 
     obj = _.pick(obj, [
         'tls',
