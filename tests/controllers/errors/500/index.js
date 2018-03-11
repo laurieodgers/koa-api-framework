@@ -3,6 +3,6 @@ var errors = {};
 
 module.exports = errors;
 
-errors.get = function*() {
+errors.get = async (ctx, next) => {
     throw new Error("500 internal server error");
 };

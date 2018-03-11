@@ -3,10 +3,10 @@ var personList = {};
 
 module.exports = personList;
 
-personList.get = function*() {
+personList.get = async (ctx, next) => {
     // GET https://api.foo.com/v2/person/list
     // Access models through this.models
-    this.data.people = [
+    ctx.data.people = [
       {
         name: "Jane",
       },
