@@ -1,5 +1,5 @@
 'use strict';
-var KoaApiFramework = require('../index')
+var KoaApiFramework = require('koa-api-framework')
 var co = require("co");
 
 

@@ -332,7 +332,7 @@ ApiFramework.prototype.start = function*() {
             if (resources[i].methods) {
 
                 // get the file and register the routes
-                var controllerAbsolutePath = process.cwd() + self.controllerPath + thisPath + '/index';
+                var controllerAbsolutePath = process.cwd() + self.controllerPath + '/' + thisPath + '/index';
                 try {
                     var endpoints = require(controllerAbsolutePath);
                 } catch (err) {
