@@ -26,6 +26,11 @@ See /example for a complete example on how to construct your API.
 - `this.data` within your controllers allows you to return data to the client in the prescribed data structure. If you wish to override this with your own data structure, then assign your response body to `this.body`.
 - Any errors thrown within your controllers will be caught by the framework in order to always present JSON to the client. To throw an error and return a HTTP status code and message to the client, use `throw new Error("418:I'm a teapot!");` where 418 is the status code, and "I'm a teapot!" is the error message to the user.
 
+# Migrating to koa-api-framework 2 / Koa 2
+
+- The framework has changed to match the new promise-based middleware signature of koa 2. See the [koa 2.xreadme](https://github.com/koajs/koa/tree/2.0.0-alpha.3) for more information or see the example for an example on how to use async/await.
+
+
 ## Example
 A complete example can be found under `/example`.
 

@@ -1,3 +1,6 @@
+# 2.0.0
+- Fixed deprecation messages. Raised to major version due to lack of backwards compatibility. (closes #4)
+
 # 1.1.1
 - Added checks to ensure TLS cert and key exist (closes #7)
 - Fixed error in controllers not displaying to console (closes #8)

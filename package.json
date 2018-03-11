@@ -1,13 +1,14 @@
 {
   "name": "koa-api-framework",
-  "version": "1.1.1",
-  "description": "An API framework using Koa built using RAML",
+  "version": "2.0.0",
+  "description": "An API framework using Koa 2 built using RAML",
   "main": "index.js",
   "scripts": {
     "test": "bash tests/test.sh"
   },
   "keywords": [
     "koa",
+    "koa2",
     "api",
     "api-framework",
     "koa-api-framework"
