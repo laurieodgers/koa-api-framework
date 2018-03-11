@@ -77,133 +77,125 @@ ApiFramework.prototype.start = function*() {
         .use(cors())
         .use(bodyParser());
 
-    app.use(function*(next) {
-        this.db = self.database;
-        this.models = self.models;
-        this.jwtSecret = self.jwtSecret;
-        this.authTraits = self.authTraits;
-        this.controllerPath = self.controllerPath;
+    app.use(async (ctx, next) => {
+        ctx.db = self.database;
+        ctx.models = self.models;
+        ctx.jwtSecret = self.jwtSecret;
+        ctx.authTraits = self.authTraits;
+        ctx.controllerPath = self.controllerPath;
 
         // set up data so we can use it downstream
-        this.data = {};
+        ctx.data = {};
 
-        yield next;
-    });
-
-    // verify incoming data
-    app.use(function*(next) {
-        var urlArray = this.request.url.substr(1).split('/');
-        this.ramlRef = this.request.url;
+        var urlArray = ctx.request.url.substr(1).split('/');
+        ctx.ramlRef = ctx.request.url;
 
         // strip the queryString
-        var searchString = this.request.url.split('?')[0];
+        var searchString = ctx.request.url.split('?')[0];
 
         // search for this endpoint in our list for easy validation
         for (var i = 0; i < self.endpoints.length; i++) {
             if (
-                (self.endpoints[i].method.toLowerCase() == this.request.method.toLowerCase()) &&
+                (self.endpoints[i].method.toLowerCase() == ctx.request.method.toLowerCase()) &&
                 (searchString.toLowerCase().match(self.endpoints[i].regexPath))
             ) {
-                this.endpoint = self.endpoints[i];
+                ctx.endpoint = self.endpoints[i];
             }
         }
 
-        if (!this.endpoint) {
-            returnError(this, 404, "Endpoint not found");
+        if (!ctx.endpoint) {
+            returnError(ctx, 404, "Endpoint not found");
             return;
         }
 
         var contentType;
 
         // validate the content type
-        if (this.request.header['content-type']) {
-            var contentTypeArray = this.request.header['content-type'].toLowerCase().split(';');
+        if (ctx.request.header['content-type']) {
+            var contentTypeArray = ctx.request.header['content-type'].toLowerCase().split(';');
             contentType = contentTypeArray[0];
 
             // if we don't accept this content type then reject it
             if (contentType != 'application/json') {
-                returnError(this, 415, "Content-type '" + contentType + "' not supported");
+                returnError(ctx, 415, "Content-type '" + contentType + "' not supported");
                 return;
             }
-        } else if (this.request.header['content-length']) {  // content length is specified but content type is not
-            returnError(this, 415, "Content-type not specified");
+        } else if (ctx.request.header['content-length']) {  // content length is specified but content type is not
+            returnError(ctx, 415, "Content-type not specified");
             return;
         }
 
-        yield next;
-    });
-
-    app.use(function*(next) {
         // validate the request body
-        if (this.endpoint.requestSchema) {
-            if (!this.request.body) {
+        if (ctx.endpoint.requestSchema) {
+            if (!ctx.request.body) {
                 throw new Error("400:No data received");
             }
 
-            var validation = v.validate(this.request.body, this.endpoint.requestSchema);
+            var validation = v.validate(ctx.request.body, ctx.endpoint.requestSchema);
 
             if (validation.errors.length > 0) {
                 throw new Error("400:" + validation.errors.join(", "));
             }
         }
-        yield next;
-    });
 
-    app.use(function*(next) {
+
         // process JWT for JWT endpoints
-        if (this.endpoint.traits && this.authTraits.some(r=> this.endpoint.traits.indexOf(r) >= 0)> -1) {
+        if (ctx.endpoint.traits && ctx.authTraits.some(r=> ctx.endpoint.traits.indexOf(r) >= 0)> -1) {
+
             // make sure it has an authorization header
-            if (!this.request.header.authorization) {
-                returnError(this, 401, "Unauthorized");
+            if (!ctx.request.header.authorization) {
+                returnError(ctx, 401, "Unauthorized");
                 return;
             }
 
             // remove Bearer from the start of the string
-            var jwtString = this.request.header.authorization.replace(/^([Bb][Ee][Aa][Rr][Ee][Rr]\s)/,"");
+            var jwtString = ctx.request.header.authorization.replace(/^([Bb][Ee][Aa][Rr][Ee][Rr]\s)/,"");
 
             try {
                 // process jwt and store for later use
-                this.token = jwt.decode(jwtString, self.jwtSecret);
+                ctx.token = jwt.decode(jwtString, self.jwtSecret);
             } catch (err) {
                 // not a valid JWT
-                returnError(this, 400, "Invalid JWT");
+                returnError(ctx, 400, "Invalid JWT");
                 return;
             }
 
+
             // make sure the JWT includes a subject
-            if (!this.token.sub) {
+            if (!ctx.token.sub) {
                 // not a valid JWT
-                returnError(this, 400, "Invalid JWT - Missing Subject");
+                returnError(ctx, 400, "Invalid JWT - Missing Subject");
                 return;
             }
         }
 
         try {
-            yield next;
+
+            await next();
 
             // TODO: validate the response body
             /*
-            if (this.endpoint.responseSchema) {
-                var validation = v.validate(this.request.body, this.endpoint.responseSchema);
+            if (ctx.endpoint.responseSchema) {
+                var validation = v.validate(ctx.request.body, ctx.endpoint.responseSchema);
 
                 if (validation.errors.length > 0) {
                     throw new Error("400:" + validation.errors.join(", "));
                 }
             }*/
         } catch(err) {
-            returnError(this, 500, "An internal error occurred", err);
+            returnError(ctx, 500, "An internal error occurred", err);
             return;
         }
 
         // everything worked so return status 200 and the data
-        this.status = 200;
+        ctx.status = 200;
 
         // if the user didn't define this.body then set up a structure for them
-        if (!this.body) {
-            this.body = {
+        if (!ctx.body) {
+            ctx.body = {
                 statusCode: 200,
                 message: '',
-                data: this.data
+                data: ctx.data
             }
         }
     });
