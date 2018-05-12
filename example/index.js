@@ -1,9 +1,7 @@
 'use strict';
 var KoaApiFramework = require('koa-api-framework')
-var co = require("co");
 
-
-co(function* () {
+(async () => {
     // set up the framework
     var framework = new KoaApiFramework({
         debug: true,
@@ -21,5 +19,8 @@ co(function* () {
         authTraits: ['authenticated', 'administrator']
     });
 
-    yield framework.start();
-});
+    // run the framework
+    await framework.start();
+})().catch(e => {
+    console.error(e)
+});;

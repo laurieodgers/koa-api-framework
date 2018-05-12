@@ -164,9 +164,6 @@ if [[ "${output}" != '{"hello":"world!"}'  || ${statusCode} -ne 200 ]]; then
 fi
 echo ""
 
-
-sleep 10
-
 # kill the server
 kill ${serverPid}
 

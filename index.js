@@ -59,7 +59,7 @@ function processUri(uri) {
     return pathBase.join('/');
 }
 
-ApiFramework.prototype.start = function*() {
+ApiFramework.prototype.start = async function() {
     var self = this;
 
     // sanity checks
