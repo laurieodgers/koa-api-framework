@@ -1,3 +1,7 @@
+# 2.1.0
+- Completely removed co code
+- Added check for exp to ensure that the token has not expired
+
 # 2.0.0
 - Fixed deprecation messages. Raised to major version due to lack of backwards compatibility. (closes #4)
 

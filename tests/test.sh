@@ -5,6 +5,11 @@ set -e
 jwtWithNoSub="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1MTYyNzMwNjEuNTA0LCJ0ZXN0IjoidGVzdCJ9.tYQIrlVX7A4jaib852v6RauFlKiokcXAanfqHKZogMQ"
 jwtWithSub="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0IiwiaWF0IjoxNTE2Mjc4NTExLjAxNCwidGVzdCI6InRlc3QifQ.3CBFs7JXh70C6qC8FsSQK2jYwsEYMJbDp1wgp8ltr3E"
 jwtNotOurs="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWV9.TJVA95OrM7E2cBab30RMHrHDcEfxjoYZgeFONFh7HgQ"
+
+expiredJWT=$( node tests/createjwt.js -100 )
+nonExpiredJWT=$( node tests/createjwt.js 100 )
+
+
 node tests/server.js &
 
 serverPid=$!
@@ -62,6 +67,22 @@ echo "6. Valid JWT but no sub"
 output=$( curl -s -H "Authorization: Bearer ${jwtWithNoSub}" -X "GET" http://localhost:8080/v2/user/whoami )
 echo "${output}"
 if [[ "${output}" != '{"status":400,"message":"Invalid JWT - Missing Subject","data":{}}' ]]; then
+    echo "FAILED"
+    exitWithError
+fi
+echo ""
+echo "7. Expired JWT"
+output=$( curl -s -H "Authorization: Bearer ${expiredJWT}" -X "GET" http://localhost:8080/v2/user/whoami )
+echo "${output}"
+if [[ "${output}" != '{"status":401,"message":"Invalid JWT - Expired","data":{}}' ]]; then
+    echo "FAILED"
+    exitWithError
+fi
+echo ""
+echo "7. Non Expired JWT"
+output=$( curl -s -H "Authorization: Bearer ${nonExpiredJWT}" -X "GET" http://localhost:8080/v2/user/whoami )
+echo "${output}"
+if [[ "${output}" != '{"statusCode":200,"message":"","data":{"userId":"1"}}' ]]; then
     echo "FAILED"
     exitWithError
 fi

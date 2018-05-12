@@ -1,7 +1,8 @@
 'use strict';
-var KoaApiFramework = require('koa-api-framework')
 
 (async () => {
+    var KoaApiFramework = require('koa-api-framework');
+    
     // set up the framework
     var framework = new KoaApiFramework({
         debug: true,

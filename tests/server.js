@@ -1,7 +1,8 @@
 'use strict';
-var KoaApiFramework = require('../index')
 
 (async () => {
+    var KoaApiFramework = require('../index');
+    
     // set up the framework
     var framework = new KoaApiFramework({
         debug: true,
@@ -18,5 +19,5 @@ var KoaApiFramework = require('../index')
     // run the framework
     await framework.start();
 })().catch(e => {
-    console.error(e)
+    console.error(e);
 });;
